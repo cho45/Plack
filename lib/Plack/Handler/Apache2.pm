@@ -38,6 +38,7 @@ sub call_app {
 
     my $env = {
         %ENV,
+        HTTP_AUTHORIZATION    => $r->headers_in->{Authorization},
         'psgi.version'        => [ 1, 1 ],
         'psgi.url_scheme'     => ($ENV{HTTPS}||'off') =~ /^(?:on|1)$/i ? 'https' : 'http',
         'psgi.input'          => $r,

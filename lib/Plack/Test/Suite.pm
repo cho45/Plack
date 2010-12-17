@@ -632,6 +632,27 @@ our @TEST = (
             ];
         },
     ],
+    [
+        'handle Authorization header',
+        sub {
+            my $cb  = shift;
+            my $req = HTTP::Request->new(
+                GET => "http://127.0.0.1/",
+            );
+            $req->push_header(Authorization => 'Basic XXXX');
+            my $res = $cb->($req);
+            is $res->header('X-AUTHORIZATION'), 1;
+            is $res->content, 'Basic XXXX';
+        },
+        sub {
+            my $env = shift;
+            return [
+                200,
+                [ 'Content-Type' => 'text/plain', 'X-AUTHORIZATION' => $env->{HTTP_AUTHORIZATION} ? 1 : 0 ],
+                [ $env->{HTTP_AUTHORIZATION} ]
+            ];
+        },
+    ],
 );
 
 sub runtests {
