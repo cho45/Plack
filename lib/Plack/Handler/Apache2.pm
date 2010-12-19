@@ -38,7 +38,6 @@ sub call_app {
 
     my $env = {
         %ENV,
-        HTTP_AUTHORIZATION    => $r->headers_in->{Authorization},
         'psgi.version'        => [ 1, 1 ],
         'psgi.url_scheme'     => ($ENV{HTTPS}||'off') =~ /^(?:on|1)$/i ? 'https' : 'http',
         'psgi.input'          => $r,
@@ -49,6 +48,10 @@ sub call_app {
         'psgi.streaming'      => Plack::Util::TRUE,
         'psgi.nonblocking'    => Plack::Util::FALSE,
     };
+
+    if (defined(my $HTTP_AUTHORIZATION = $r->headers_in->{Authorization})) {
+        $env->{HTTP_AUTHORIZATION} = $HTTP_AUTHORIZATION;
+    }
 
     $class->fixup_path($r, $env);
 
