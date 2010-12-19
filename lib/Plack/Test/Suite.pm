@@ -636,23 +636,27 @@ our @TEST = (
         'handle Authorization header',
         sub {
             my $cb  = shift;
-            {
-                my $req = HTTP::Request->new(
-                    GET => "http://127.0.0.1/",
-                );
-                $req->push_header(Authorization => 'Basic XXXX');
-                my $res = $cb->($req);
-                is $res->header('X-AUTHORIZATION'), 1;
-                is $res->content, 'Basic XXXX';
-            };
+            SKIP: {
+                skip "Authorization header is unsupported under CGI", 4 if ($ENV{PLACK_TEST_HANDLER} || "") eq "CGI";
 
-            {
-                my $req = HTTP::Request->new(
-                    GET => "http://127.0.0.1/",
-                );
-                my $res = $cb->($req);
-                is $res->header('X-AUTHORIZATION'), 0;
-                is $res->content, '';
+                {
+                    my $req = HTTP::Request->new(
+                        GET => "http://127.0.0.1/",
+                    );
+                    $req->push_header(Authorization => 'Basic XXXX');
+                    my $res = $cb->($req);
+                    is $res->header('X-AUTHORIZATION'), 1;
+                    is $res->content, 'Basic XXXX';
+                };
+
+                {
+                    my $req = HTTP::Request->new(
+                        GET => "http://127.0.0.1/",
+                    );
+                    my $res = $cb->($req);
+                    is $res->header('X-AUTHORIZATION'), 0;
+                    is $res->content, '';
+                };
             };
         },
         sub {
