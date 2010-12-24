@@ -218,8 +218,9 @@ sub uri {
     my $path_escape_class = '^A-Za-z0-9\-\._~/';
 
     my $path = URI::Escape::uri_escape($self->env->{PATH_INFO} || '', $path_escape_class);
-    $path .= '?' . $self->env->{QUERY_STRING}
-        if defined $self->env->{QUERY_STRING} && $self->env->{QUERY_STRING} ne '';
+    if (index($self->env->{REQUEST_URI} || '', '?') != -1) {
+        $path .= '?' . $self->env->{QUERY_STRING}
+    }
 
     $base =~ s!/$!! if $path =~ m!^/!;
 
